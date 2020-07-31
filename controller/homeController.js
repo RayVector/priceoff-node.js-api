@@ -1,10 +1,9 @@
 const {Router} = require('express');
 const router = Router();
+const userList = require('../db/user');
 
 router.get('/', (req, res) => {
-  res.json({
-    msg: 'Hello world',
-  })
+  res.json(userList)
 });
 
 module.exports = router;
