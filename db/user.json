@@ -1,10 +1,6 @@
-[
-  {
-    "userList": [
-      {
-        "name": "Ray",
-        "cart": []
-      }
-    ]
-  }
-]
+{
+  "name": "Ray Vector",
+  "phone": "+7918525252",
+  "products": [],
+  "favorites": []
+}
