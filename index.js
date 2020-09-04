@@ -5,7 +5,7 @@ const cors = require('cors');
 
 const app = express();
 
-app.use(cors());
+app.use(cors({credentials: true, origin: true}));
 // controllers routes:
 app.use(`${apiUrl}get-user`, require('./routes/user'));
 app.use(`${apiUrl}get-categories`, require('./routes/categories'));
