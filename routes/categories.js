@@ -9,9 +9,10 @@ router.get('/', async (req, res) => {
       /**
        * prepare item
        */
+      const {type: value, title} = category;
       return {
-        value: category.type,
-        title: category.title,
+        value,
+        title,
       }
     }))
   });

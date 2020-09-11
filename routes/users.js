@@ -9,11 +9,12 @@ router.get('/', async (req, res) => {
       /**
        * prepare item
        */
+      const {name, phone, productList, favoriteList} = user;
       return {
-        name: user.name,
-        phone: user.phone,
-        productList: user.productList,
-        favoriteList: user.favoriteList,
+        name,
+        phone,
+        productList,
+        favoriteList,
       }
     }))
   })
