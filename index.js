@@ -2,9 +2,10 @@ const express = require('express')
 const session = require('express-session')
 const MongoDBStore = require('connect-mongodb-session')(session)
 const config = require('./configs/main')
-const { PORT, API_URL, MONGODB_URL, SECRET } = config
 const cors = require('cors')
 const mongoose = require('mongoose')
+const user = require('./middleware/user')
+const { PORT, API_URL, MONGODB_URL, SECRET } = config
 
 
 /**
@@ -21,7 +22,7 @@ app.use(express.json())
 /**
  * CORS
  */
-app.use(cors({ credentials: true, origin: true }))
+app.use(cors(config.CORS))
 
 /**
  * DB
@@ -41,7 +42,7 @@ store.on('error', error => {
 app.use(session({
   secret: SECRET,
   cookie: {
-    maxAge: 1000 * 60 * 60 * 24 * 7, // 1 week
+    maxAge: config.COOKIE.MAX_AGE,
   },
   store: store,
   resave: true,
@@ -52,6 +53,11 @@ app.use(session({
     serverSelectionTimeoutMS: 10000,
   },
 }))
+
+/**
+ * middleware
+ */
+app.use(user)
 
 /**
  * Routes
