@@ -2,26 +2,35 @@ const { Router } = require('express')
 const router = Router()
 const User = require('../models/user')
 const auth = require('../middleware/auth')
+const prepareResponse = require('../utils/api/prepareResponse')
 
 function loginUser(logUser, req, res) {
-  req.session.user = logUser
-  req.session.isAuth = true
-  const resBody = {
-    data: { name: logUser.name, phone: logUser.phone },
-    msg: `Authenticated: ${logUser.name}, ${logUser.phone}`,
+  try {
+    req.session.userId = logUser._id
+    req.session.isAuth = true
+    req.session.save(err => {
+      if (err) throw err
+      res.send(prepareResponse(
+        { name: logUser.name, phone: logUser.phone },
+        [`Authenticated: ${logUser.name}`],
+        'success',
+      ))
+    })
+  } catch (e) {
+    res.send(prepareResponse(
+      {},
+      ['Login error'],
+      'error',
+    ))
   }
-  req.session.save(err => {
-    if (err) throw err
-    res.send(resBody)
-  })
 }
 
-
 /**
- * get active session
+ * get active user
+ * 4DEV
  */
 router.get('/', auth, async (req, res) => {
-  res.send(req.session)
+  res.send(prepareResponse(req.session, [], 'success'))
 })
 
 /**
@@ -32,12 +41,24 @@ router.post('/', async (req, res) => {
 
   /**
    * Validation:
+   * TODO: create validation utility
    */
-  if (!phone || phone.length < 11) throw res.send('Incorrect required phone: 11 symbols at minimum')
-  else if (name.length < 3 && typeof name === 'string') throw res.send('Incorrect required name: 3 letters at minimum')
-
+  if (!phone || phone.length < 11) {
+    res.send(prepareResponse(
+      {},
+      ['Incorrect required phone: 11 symbols at minimum'],
+      'error',
+    ))
+  } else if (name.length < 3 && typeof name === 'string') {
+    res.send(prepareResponse(
+      {},
+      ['Incorrect required name: 3 letters at minimum'],
+      'error',
+    ))
+  }
   const logUser = await User.findOne({ phone })
   if (logUser) {
+
     /**
      * Login
      */
@@ -47,11 +68,18 @@ router.post('/', async (req, res) => {
     /**
      * Authorization + Login
      */
-    const newUser = new User({ name, phone })
-    const savedUser = await newUser.save()
-    loginUser(savedUser, req, res)
+    try {
+      const newUser = new User({ name, phone })
+      const savedUser = await newUser.save()
+      loginUser(savedUser, req, res)
+    } catch (e) {
+      res.send(prepareResponse(
+        {},
+        ['Authentication error'],
+        'error',
+      ))
+    }
   }
-
 })
 
 /**
@@ -60,7 +88,11 @@ router.post('/', async (req, res) => {
 router.get('/logout', async (req, res) => {
   req.session.destroy(err => {
     if (err) throw err
-    res.send('Sign Out')
+    res.send(prepareResponse(
+      {},
+      ['Sign Out'],
+      'success',
+    ))
   })
 })
 

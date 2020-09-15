@@ -62,9 +62,10 @@ app.use(user)
 /**
  * Routes
  */
-app.use(`${API_URL}users`, require('./routes/users'))
+app.use(`${API_URL}user`, require('./routes/user'))
 app.use(`${API_URL}categories`, require('./routes/categories'))
 app.use(`${API_URL}login`, require('./routes/login'))
+app.use(`${API_URL}product`, require('./routes/product'))
 
 /**
  * Init

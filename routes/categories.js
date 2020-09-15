@@ -2,25 +2,31 @@ const { Router } = require('express')
 const router = Router()
 const Category = require('../models/category')
 const auth = require('../middleware/auth')
+const prepareResponse = require('../utils/api/prepareResponse')
 
 /**
  * get all categories
  */
 router.get('/', auth, async (req, res) => {
-  await Category.find({}, (err, result) => {
-    if (err) console.log(err)
-    else res.json(result.map(category => {
-      /**
-       * prepare item
-       */
-      const { type: value, title } = category
-      return {
-        value,
-        title,
-      }
-    }))
-  })
-
+  try {
+    const categoryList = await Category.find()
+    res.send(prepareResponse(
+      {
+        categoryList: categoryList.map(category => {
+          const { type: value, title } = category
+          return { value, title }
+        }),
+      },
+      [],
+      'success',
+    ))
+  } catch (e) {
+    res.send(prepareResponse(
+      {},
+      ['Categories not found'],
+      'error',
+    ))
+  }
 })
 
 module.exports = router
