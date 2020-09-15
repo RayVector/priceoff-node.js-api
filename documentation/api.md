@@ -12,10 +12,12 @@
     - PUT `product/` - update product;
     - GET `product/:ID/` - get product by id;
     - DELETE `product/:ID/` - remove product by id;
-- users:
+- user:
     - GET `user/` - get current user;
+    - GET `user/products/` - get user products;
     
 <hr/>
+
 # Routes req body:
 
 - **login**.POST:<br>
