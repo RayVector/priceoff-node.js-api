@@ -17,7 +17,7 @@ router.post('/', auth, async (req, res) => {
     res.send(prepareResponse(
       {},
       [`Product ${savedProduct.title} created`],
-      'success')
+      'success'),
     )
   } catch (e) {
     res.send(prepareResponse({}, ['Product creation error'], 'error'))
@@ -44,7 +44,7 @@ router.get('/:id', async (req, res) => {
 /**
  *  remove product by id and remove product in user
  */
-router.delete('/:id', async (req, res) => {
+router.delete('/:id', auth, async (req, res) => {
   try {
     const removedProduct = await Product.findOneAndRemove(req.params.id)
     await User.findByIdAndUpdate(
