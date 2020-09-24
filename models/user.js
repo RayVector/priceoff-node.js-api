@@ -18,4 +18,16 @@ const userSchema = new Schema({
   ],
 })
 
+/**
+ * remove product by id from productList
+ * @param id
+ * @returns {*}
+ */
+userSchema.methods.removeProduct = function(id) {
+  let productList = [...this.productList]
+  productList = productList.filter(product => product.id !== id)
+  this.productList = { productList }
+  return this.save()
+}
+
 module.exports = mongoose.model('user', userSchema, 'users')

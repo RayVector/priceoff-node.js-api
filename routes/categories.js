@@ -10,20 +10,34 @@ const prepareResponse = require('../utils/api/prepareResponse')
 router.get('/', auth, async (req, res) => {
   try {
     const categoryList = await Category.find()
-    res.send(prepareResponse(
-      {
-        categoryList: categoryList.map(category => {
-          const { type: value, title } = category
-          return { value, title }
-        }),
-      },
-      [],
-      'success',
-    ))
+    if (categoryList && categoryList.length) {
+      res.send(prepareResponse(
+        {
+          categoryList: categoryList.map(category => {
+            const { type: value, title } = category
+            return { value, title }
+          }),
+        },
+        [],
+        'success',
+      ))
+    } else {
+      res.send(prepareResponse(
+        {},
+        [{
+          title: 'Categories not found',
+          grade: 'warning',
+        }],
+        'error',
+      ))
+    }
   } catch (e) {
     res.send(prepareResponse(
       {},
-      ['Categories not found'],
+      [{
+        title: 'get categories error',
+        grade: 'error',
+      }],
       'error',
     ))
   }

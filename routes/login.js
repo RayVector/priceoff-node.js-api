@@ -12,14 +12,20 @@ function loginUser(logUser, req, res) {
       if (err) throw err
       res.send(prepareResponse(
         { name: logUser.name, phone: logUser.phone },
-        [`Authenticated: ${logUser.name}`],
+        [{
+          title: `Authenticated: ${logUser.name}`,
+          grade: 'success',
+        }],
         'success',
       ))
     })
   } catch (e) {
     res.send(prepareResponse(
       {},
-      ['Login error'],
+      [{
+        title: 'Login error',
+        grade: 'error',
+      }],
       'error',
     ))
   }
@@ -46,13 +52,19 @@ router.post('/', async (req, res) => {
   if (!phone || phone.length < 11) {
     res.send(prepareResponse(
       {},
-      ['Incorrect required phone: 11 symbols at minimum'],
+      [{
+        title: 'Incorrect required phone: 11 symbols at minimum',
+        grade: 'warning',
+      }],
       'error',
     ))
   } else if (name.length < 3 && typeof name === 'string') {
     res.send(prepareResponse(
       {},
-      ['Incorrect required name: 3 letters at minimum'],
+      [{
+        title: 'Incorrect required name: 3 letters at minimum',
+        grade: 'warning',
+      }],
       'error',
     ))
   }
@@ -75,7 +87,10 @@ router.post('/', async (req, res) => {
     } catch (e) {
       res.send(prepareResponse(
         {},
-        ['Authentication error'],
+        [{
+          title: 'Authentication error',
+          grade: 'error',
+        }],
         'error',
       ))
     }
@@ -90,7 +105,10 @@ router.get('/logout', auth, async (req, res) => {
     if (err) throw err
     res.send(prepareResponse(
       {},
-      ['Sign Out'],
+      [{
+        title: 'Sign Out',
+        grade: 'success',
+      }],
       'success',
     ))
   })

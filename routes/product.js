@@ -33,7 +33,14 @@ router.get('/:id', async (req, res) => {
     if (foundProduct) {
       res.send(prepareResponse(foundProduct, [], 'success'))
     } else {
-      res.send(prepareResponse({}, ['Product not found'], 'error'))
+      res.send(prepareResponse(
+        {},
+        [{
+          title: 'Product not found',
+          grade: 'warning',
+        }],
+        'error',
+      ))
     }
   } catch (e) {
     throw new Error()
@@ -46,20 +53,38 @@ router.get('/:id', async (req, res) => {
  */
 router.delete('/:id', auth, async (req, res) => {
   try {
-    const removedProduct = await Product.findOneAndRemove(req.params.id)
-    await User.findByIdAndUpdate(
-      req.session.userId,
-      { $pull: { productList: { $in: req.params.id } } })
+    const removedProduct = await Product.findByIdAndRemove(req.params.id)
+    const user = await User.findById(req.session.userId)
+    user.removeProduct(req.params.id)
+
     if (removedProduct) {
       res.send(prepareResponse(
         {},
-        [`Product ${removedProduct.title} deleted`],
-        'success'))
+        [{
+          title: `Product ${removedProduct.title} deleted`,
+          grade: 'success',
+        }],
+        'success'),
+      )
     } else {
-      res.send(prepareResponse({}, ['Product not found'], 'error'))
+      res.send(prepareResponse(
+        {},
+        [{
+          title: 'Product not found',
+          grade: 'warning',
+        }],
+        'error'),
+      )
     }
   } catch (e) {
-    res.send(prepareResponse({}, ['Product deleting error'], 'error'))
+    res.send(prepareResponse(
+      {},
+      [{
+        title: 'Product deleting error',
+        grade: 'error',
+      }],
+      'error',
+    ))
   }
 })
 
