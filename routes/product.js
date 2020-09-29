@@ -5,6 +5,7 @@ const prepareResponse = require('../utils/api/prepareResponse')
 // models
 const Product = require('../models/product')
 const User = require('../models/user')
+const Category = require('../models/category')
 
 /**
  *  add new product
@@ -22,6 +23,74 @@ router.post('/', auth, async (req, res) => {
   } catch (e) {
     res.send(prepareResponse({}, ['Product creation error'], 'error'))
   }
+})
+
+/**
+ * get all products
+ */
+router.post('/all/:page', async (req, res) => {
+
+  // TODO: refactor to AGGREGATE method
+
+  const page = req.params.page
+  const limit = 10
+  const {
+    category,
+  } = req.body
+
+  const conditions = {}
+  if (category) conditions.categoryId = category
+
+  try {
+    const productList = await Product.find(conditions)
+    .limit(limit * 1)
+    .skip((page - 1) * limit)
+
+    const foundCategory = await Category.findOne({ type: category })
+
+    if (productList && productList.length) {
+      res.send(prepareResponse(
+        {
+          productList: productList.map(product => {
+            const {
+              images,
+              title,
+              description,
+              createdDate,
+            } = product
+
+            return {
+              images: images.map(image => {
+                const { title, src, isMain } = image
+                return { title, src, isMain }
+              }),
+              title,
+              description,
+              createdDate,
+              category: {
+                type: foundCategory.type,
+                title: foundCategory.title,
+              },
+            }
+          }),
+        },
+        [],
+        'success'))
+    } else {
+      res.send(prepareResponse(
+        {},
+        [{
+          title: 'Products not found',
+          grade: 'warning',
+        }],
+        'error',
+      ))
+    }
+  } catch (e) {
+    throw new Error()
+  }
+
+
 })
 
 /**
@@ -89,3 +158,4 @@ router.delete('/:id', auth, async (req, res) => {
 })
 
 module.exports = router
+

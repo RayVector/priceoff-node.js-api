@@ -27,7 +27,11 @@ const productSchema = new Schema({
   },
   description: String,
   email: String,
-  images: [{ type: String }],
+  images: [{
+    title: String,
+    src: String,
+    isMain: Boolean,
+  }],
 })
 
 module.exports = mongoose.model('product', productSchema, 'products')
